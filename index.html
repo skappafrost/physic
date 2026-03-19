@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html lang="vi" data-theme="dark" data-charge="positive">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="color-scheme" content="dark light">
+    <title>Điện Trường Đều | Bài Học Tương Tác</title>
+    <link rel="stylesheet" href="./styles.css">
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+</head>
+<body class="is-loading">
+    <div class="loading-screen" id="loadingScreen" aria-live="polite">
+        <button class="loading-skip" id="loadingSkip" type="button">Bỏ qua</button>
+        <div class="loading-core">
+            <span class="loading-orbit loading-orbit--one"></span>
+            <span class="loading-orbit loading-orbit--two"></span>
+            <span class="loading-orbit loading-orbit--three"></span>
+            <span class="loading-particle loading-particle--one"></span>
+            <span class="loading-particle loading-particle--two"></span>
+            <span class="loading-particle loading-particle--three"></span>
+            <span class="loading-particle loading-particle--four"></span>
+            <div class="loading-center">E</div>
+        </div>
+        <p class="loading-copy">Đang khởi tạo trường điện...</p>
+        <div class="loading-bar" aria-hidden="true"><span></span></div>
+    </div>
+
+    <div class="site-backdrop" aria-hidden="true">
+        <div class="shooting-stars" id="fxStars"></div>
+        <ul class="energy-circles">
+            <li></li>
+            <li></li>
+            <li></li>
+            <li></li>
+            <li></li>
+            <li></li>
+            <li></li>
+            <li></li>
+        </ul>
+    </div>
+
+    <header class="site-header">
+        <a class="brand" href="#top" aria-label="Điện trường đều">
+            <span class="brand-mark">E</span>
+            <span class="brand-copy">
+                <strong>Điện trường đều</strong>
+                <small>Bài học vật lý tương tác, gọn và dễ đọc</small>
+            </span>
+        </a>
+
+        <nav class="top-nav" aria-label="Điều hướng chính">
+            <a href="#lesson">Bài học</a>
+            <a href="#simulator">Mô phỏng</a>
+            <a href="#qa">Câu hỏi</a>
+        </nav>
+
+        <button class="theme-toggle" id="themeToggle" type="button" aria-label="Đổi giao diện">
+            Chuyển sang giao diện sáng
+        </button>
+    </header>
+
+    <main class="page" id="top">
+        <section class="hero">
+            <div class="hero-copy">
+                <span class="eyebrow">Chương II · Điện trường</span>
+                <h1>Điện trường đều</h1>
+                <p class="hero-lead">
+                    Trang này gom phần cốt lõi của bài học vào một bố cục rõ ràng: khái niệm, công thức,
+                    mô phỏng nhanh, câu hỏi ôn tập và các lỗi rất hay nhầm khi làm bài.
+                </p>
+
+                <div class="hero-actions">
+                    <a class="button button--primary" href="#lesson">Mở bài học</a>
+                    <a class="button button--ghost" href="#simulator">Thử mô phỏng</a>
+                </div>
+
+                <div class="hero-sigil-row" aria-label="Biểu tượng chủ đề">
+                    <div class="hero-sigil">
+                        <span class="hero-sigil__icon">E</span>
+                        <small>Điện trường</small>
+                    </div>
+                    <div class="hero-sigil">
+                        <span class="hero-sigil__icon">U</span>
+                        <small>Hiệu điện thế</small>
+                    </div>
+                    <div class="hero-sigil">
+                        <span class="hero-sigil__icon">d</span>
+                        <small>Khoảng cách</small>
+                    </div>
+                    <div class="hero-sigil">
+                        <span class="hero-sigil__icon">q</span>
+                        <small>Điện tích thử</small>
+                    </div>
+                </div>
+
+                <div class="stat-grid">
+                    <article class="stat-card">
+                        <span>Cốt lõi</span>
+                        <strong>\( E = \dfrac{U}{d} \)</strong>
+                        <p>Liên hệ trực tiếp giữa hiệu điện thế, khoảng cách và cường độ điện trường.</p>
+                    </article>
+                    <article class="stat-card">
+                        <span>Hình học</span>
+                        <strong>Đường sức song song</strong>
+                        <p>Trong vùng đều, các đường sức là những đường thẳng song song và cách đều nhau.</p>
+                    </article>
+                    <article class="stat-card">
+                        <span>Động lực</span>
+                        <strong>\( F = qE \)</strong>
+                        <p>Lực điện đổi chiều theo dấu của điện tích thử, không đổi theo vị trí trong vùng đều.</p>
+                    </article>
+                    <article class="stat-card">
+                        <span>Ôn tập</span>
+                        <strong>Q&A + Bài nhanh</strong>
+                        <p>Cuối trang có sẵn phần hỏi đáp ngắn gọn để luyện lại kiến thức.</p>
+                    </article>
+                </div>
+            </div>
+
+            <div class="hero-stage">
+                <div class="stage-card">
+                    <div class="stage-chip stage-chip--top-left">E = U / d</div>
+                    <div class="stage-chip stage-chip--top-right">F = qE</div>
+                    <div class="stage-chip stage-chip--bottom-left">Đường sức song song</div>
+                    <div class="stage-chip stage-chip--bottom-right">V giảm theo chiều E</div>
+
+                    <div class="plate plate--positive">Bản dương</div>
+
+                    <div class="field-lanes" aria-hidden="true">
+                        <span class="field-lane"></span>
+                        <span class="field-lane"></span>
+                        <span class="field-lane"></span>
+                        <span class="field-lane"></span>
+                        <span class="field-lane"></span>
+                        <span class="field-lane"></span>
+                    </div>
+
+                    <div class="scene-center">
+                        <div class="scene-charge" id="heroCharge">q+</div>
+                        <div class="scene-arrow">
+                            <span class="scene-arrow__shaft"></span>
+                            <span class="scene-arrow__label" id="heroDirection">Lực cùng chiều E</span>
+                        </div>
+                    </div>
+
+                    <div class="plate plate--negative">Bản âm</div>
+                </div>
+            </div>
+        </section>
+
+        <section class="section" id="lesson">
+            <div class="section-heading">
+                <span class="eyebrow">Bài học</span>
+                <h2>Nội dung được sắp lại theo từng ý rõ ràng</h2>
+                <p>Chọn một mục ở cột trái để xem tóm tắt, công thức, điểm cần nhớ và lỗi hay gặp.</p>
+            </div>
+
+            <div class="lesson-workspace">
+                <aside class="chapter-nav" id="chapterNav" aria-label="Các mục bài học"></aside>
+                <article class="chapter-panel" id="chapterPanel" aria-live="polite"></article>
+            </div>
+        </section>
+
+        <section class="section" id="simulator">
+            <div class="section-heading">
+                <span class="eyebrow">Mô phỏng nhanh</span>
+                <h2>Bảng tính nhỏ nhưng đúng ý nghĩa vật lý</h2>
+                <p>Thay đổi hiệu điện thế, khoảng cách và dấu điện tích để xem cường độ điện trường, lực điện và hướng lực.</p>
+            </div>
+
+            <div class="sim-layout">
+                <div class="sim-controls">
+                    <article class="control-card control-card--mode">
+                        <div class="control-head">
+                            <span>Chế độ tính</span>
+                            <strong id="calcModeValue">Tính E</strong>
+                        </div>
+                        <div class="mode-switch" id="calcModeSwitch">
+                            <button class="mode-option is-active" data-calc-mode="field" type="button">Tính E</button>
+                            <button class="mode-option" data-calc-mode="voltage" type="button">Tính U</button>
+                            <button class="mode-option" data-calc-mode="distance" type="button">Tính d</button>
+                            <button class="mode-option" data-calc-mode="force" type="button">Tính F</button>
+                        </div>
+                        <p class="control-note" id="modeHint">Nhập U và d, hệ sẽ tự tính cường độ điện trường E. Ô viền sáng là đại lượng đang được hệ tự tính.</p>
+                    </article>
+
+                    <article class="control-card">
+                        <label class="control-head" for="voltageRange">
+                            <span>Hiệu điện thế U</span>
+                            <strong id="voltageValue">120 V</strong>
+                        </label>
+                        <input id="voltageRange" type="range" min="20" max="500" step="10" value="120">
+                        <div class="manual-grid">
+                            <label class="manual-field" for="voltageInput">
+                                <span>Nhập tay</span>
+                                <input class="manual-input" id="voltageInput" type="text" value="120" inputmode="decimal" spellcheck="false" autocomplete="off" placeholder="120">
+                            </label>
+                            <label class="manual-field manual-field--unit" for="voltageUnit">
+                                <span>Đơn vị</span>
+                                <select class="unit-select" id="voltageUnit">
+                                    <option value="1" selected>V</option>
+                                    <option value="1000">kV</option>
+                                    <option value="0.001">mV</option>
+                                </select>
+                            </label>
+                        </div>
+                    </article>
+
+                    <article class="control-card">
+                        <label class="control-head" for="distanceRange">
+                            <span>Khoảng cách d</span>
+                            <strong id="distanceValue">4 cm</strong>
+                        </label>
+                        <input id="distanceRange" type="range" min="1" max="10" step="0.5" value="4">
+                        <div class="manual-grid">
+                            <label class="manual-field" for="distanceInput">
+                                <span>Nhập tay</span>
+                                <input class="manual-input" id="distanceInput" type="text" value="4" inputmode="decimal" spellcheck="false" autocomplete="off" placeholder="4">
+                            </label>
+                            <label class="manual-field manual-field--unit" for="distanceUnit">
+                                <span>Đơn vị</span>
+                                <select class="unit-select" id="distanceUnit">
+                                    <option value="0.001">mm</option>
+                                    <option value="0.01" selected>cm</option>
+                                    <option value="1">m</option>
+                                </select>
+                            </label>
+                        </div>
+                    </article>
+
+                    <article class="control-card">
+                        <div class="control-head">
+                            <span>Cường độ điện trường E</span>
+                            <strong id="fieldInputValue">3.000 V/m</strong>
+                        </div>
+                        <div class="manual-grid">
+                            <label class="manual-field" for="fieldInput">
+                                <span>Nhập tay</span>
+                                <input class="manual-input" id="fieldInput" type="text" value="3000" inputmode="decimal" spellcheck="false" autocomplete="off" placeholder="3000">
+                            </label>
+                            <label class="manual-field manual-field--unit" for="fieldUnit">
+                                <span>Đơn vị</span>
+                                <select class="unit-select" id="fieldUnit">
+                                    <option value="1" selected>V/m</option>
+                                    <option value="1000">kV/m</option>
+                                    <option value="100">V/cm</option>
+                                    <option value="100000">kV/cm</option>
+                                </select>
+                            </label>
+                        </div>
+                    </article>
+
+                    <article class="control-card" id="chargeCard">
+                        <div class="control-head">
+                            <span>Điện tích thử</span>
+                            <strong id="chargeValue">q dương</strong>
+                        </div>
+                        <div class="charge-switch" id="chargeSwitch">
+                            <button class="charge-option is-active" data-charge="positive" type="button">q dương</button>
+                            <button class="charge-option" data-charge="negative" type="button">q âm</button>
+                        </div>
+                        <div class="manual-grid">
+                            <label class="manual-field" for="chargeMagnitudeInput">
+                                <span>Độ lớn |q|</span>
+                                <input class="manual-input" id="chargeMagnitudeInput" type="text" value="200" inputmode="decimal" spellcheck="false" autocomplete="off" placeholder="200">
+                            </label>
+                            <label class="manual-field manual-field--unit" for="chargeMagnitudeUnit">
+                                <span>Đơn vị</span>
+                                <select class="unit-select" id="chargeMagnitudeUnit">
+                                    <option value="0.000000000001">pC</option>
+                                    <option value="0.000000001" selected>nC</option>
+                                    <option value="0.000001">µC</option>
+                                    <option value="0.001">mC</option>
+                                    <option value="1">C</option>
+                                </select>
+                            </label>
+                        </div>
+                        <p class="control-tip">Ô nhập tay hỗ trợ <code>6.5</code>, <code>6,5</code>, <code>2*10^-7</code> và <code>2e-7</code>. Nếu nhập dạng khoa học trực tiếp theo Coulomb, hãy chọn đơn vị <code>C</code>.</p>
+                    </article>
+
+                    <div class="result-grid">
+                        <article class="result-card" id="fieldResultCard">
+                            <span>Cường độ điện trường</span>
+                            <strong id="fieldValue">3.000 V/m</strong>
+                        </article>
+                        <article class="result-card" id="forceResultCard">
+                            <span id="forceLabel">Lực điện F</span>
+                            <strong id="forceValue">6,00 x 10^-4 N</strong>
+                            <div class="result-input-row">
+                                <input class="manual-input manual-input--compact" id="forceInput" type="text" value="0.0006" inputmode="decimal" spellcheck="false" autocomplete="off" placeholder="0.0006">
+                                <select class="unit-select unit-select--compact" id="forceUnit">
+                                    <option value="1" selected>N</option>
+                                    <option value="0.001">mN</option>
+                                    <option value="0.000001">µN</option>
+                                </select>
+                            </div>
+                            <p class="result-note" id="forceHint">Có thể nhập F để hệ suy ra |q| khi E đã biết.</p>
+                        </article>
+                        <article class="result-card">
+                            <span>Hướng lực</span>
+                            <strong id="forceDirection">Cùng chiều E</strong>
+                        </article>
+                        <article class="result-card">
+                            <span>Ghi nhớ</span>
+                            <strong id="simHint">Điện tích dương bị kéo từ bản dương xuống bản âm.</strong>
+                        </article>
+                    </div>
+                </div>
+
+                <div class="sim-stage">
+                    <div class="sim-visual">
+                        <div class="plate plate--positive">+</div>
+                        <div class="field-lanes field-lanes--compact" aria-hidden="true">
+                            <span class="field-lane"></span>
+                            <span class="field-lane"></span>
+                            <span class="field-lane"></span>
+                            <span class="field-lane"></span>
+                            <span class="field-lane"></span>
+                        </div>
+                        <div class="sim-charge" id="simCharge">q+</div>
+                        <div class="sim-arrow" id="simArrow">E</div>
+                        <div class="plate plate--negative">-</div>
+                    </div>
+
+                    <div class="sim-summary">
+                        <div class="summary-line">
+                            <span>Chế độ</span>
+                            <strong id="summaryMode">Tính E</strong>
+                        </div>
+                        <div class="summary-line">
+                            <span>U</span>
+                            <strong id="summaryVoltage">120 V</strong>
+                        </div>
+                        <div class="summary-line">
+                            <span>d</span>
+                            <strong id="summaryDistance">4 cm</strong>
+                        </div>
+                        <div class="summary-line">
+                            <span>E</span>
+                            <strong id="summaryField">3.000 V/m</strong>
+                        </div>
+                        <div class="summary-line">
+                            <span>F</span>
+                            <strong id="summaryForce">6,00 x 10^-4 N</strong>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="section" id="qa">
+            <div class="section-heading">
+                <span class="eyebrow">Câu hỏi & trả lời</span>
+                <h2>Hỏi ngắn, đáp gọn, đúng trọng tâm</h2>
+                <p>Phần này dùng để nhắc lại những điểm hay bị nhầm và một vài bài kiểm tra nhanh.</p>
+            </div>
+
+            <div class="faq-list" id="faqList"></div>
+
+            <div class="practice-wrap">
+                <h3>Câu hỏi luyện nhanh</h3>
+                <div class="practice-grid" id="practiceList"></div>
+            </div>
+        </section>
+
+        <section class="section section--compact">
+            <div class="memory-grid">
+                <article class="memory-card">
+                    <span class="eyebrow">Cần nhớ</span>
+                    <ul>
+                        <li>Trong điện trường đều: phương, chiều và độ lớn của E không đổi.</li>
+                        <li>Giữa hai bản song song: gần đúng dùng được E = U / d.</li>
+                        <li>Lực điện trên điện tích thử luôn tính bằng \( F = qE \).</li>
+                        <li>Có thể đổi qua lại giữa U, d, E bằng các hệ thức U = E.d và d = U / E.</li>
+                    </ul>
+                </article>
+
+                <article class="memory-card">
+                    <span class="eyebrow">Chuyển động</span>
+                    <ul>
+                        <li>Cùng phương điện trường: chuyển động thẳng biến đổi đều.</li>
+                        <li>Vuông góc điện trường: theo Ox thẳng đều, theo Oy nhanh dần đều.</li>
+                        <li>Quỹ đạo của điện tích bay ngang trong điện trường đều có dạng parabol.</li>
+                    </ul>
+                </article>
+
+                <article class="memory-card">
+                    <span class="eyebrow">Hay nhầm</span>
+                    <ul>
+                        <li>Quên đổi cm hoặc mm sang m trước khi tính E.</li>
+                        <li>Lẫn chiều lực điện giữa q dương và q âm.</li>
+                        <li>Dùng mô hình điện trường đều ngay cả ở mép bản cực.</li>
+                    </ul>
+                </article>
+
+                <article class="memory-card">
+                    <span class="eyebrow">Ứng dụng</span>
+                    <ul>
+                        <li>Tụ điện phẳng.</li>
+                        <li>Máy in laser, máy photocopy và máy lọc bụi tĩnh điện.</li>
+                        <li>Ống tia điện tử, máy gia tốc hạt và vùng bẻ chùm hạt.</li>
+                        <li>Thí nghiệm Millikan và một số thiết bị điện tĩnh.</li>
+                    </ul>
+                </article>
+            </div>
+        </section>
+    </main>
+
+    <script type="module" src="./app.js"></script>
+</body>
+</html>
