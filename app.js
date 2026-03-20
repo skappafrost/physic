@@ -10,11 +10,13 @@ const loadingScreen = document.getElementById("loadingScreen");
 const loadingSkip = document.getElementById("loadingSkip");
 const mathJaxScript = document.getElementById("MathJax-script");
 const fxStarsEl = document.getElementById("fxStars");
+const fxToggle = document.getElementById("fxToggle");
 
 const voltageRange = document.getElementById("voltageRange");
 const distanceRange = document.getElementById("distanceRange");
 const chargeSwitch = document.getElementById("chargeSwitch");
 const calcModeSwitch = document.getElementById("calcModeSwitch");
+const forceModeSwitch = document.getElementById("forceModeSwitch");
 
 const voltageInput = document.getElementById("voltageInput");
 const voltageUnit = document.getElementById("voltageUnit");
@@ -138,6 +140,7 @@ const motionTargetSelector = [
 
 const simulatorState = {
     mode: "field",
+    forceMethod: "u-method",
     charge: "positive",
     voltage: 120,
     distance: 0.04,
@@ -190,6 +193,7 @@ const manualBindings = [
 
 let activeChapterIndex = 0;
 let starsBuilt = false;
+let effectsDisabled = false;
 
 const surfaceMotion = new WeakMap();
 const cursorMotion = {
@@ -370,6 +374,12 @@ function applyForceToChargeMagnitude(force) {
     simulatorState.chargeMagnitude = clampPositive(force / simulatorState.field, simulatorState.chargeMagnitude, 1e-12, 1);
 }
 
+function applyForceToField(force) {
+    if (!Number.isFinite(simulatorState.chargeMagnitude) || simulatorState.chargeMagnitude <= 0) return;
+
+    simulatorState.field = clampPositive(force / simulatorState.chargeMagnitude, simulatorState.field, 1e-9, 1e12);
+}
+
 function typesetMath(target = document.body) {
     if (!window.MathJax?.typesetPromise) return;
 
@@ -398,6 +408,11 @@ function makeStars() {
 }
 
 function syncCursorGlowFrame() {
+    if (effectsDisabled) {
+        cursorMotion.frame = 0;
+        return;
+    }
+
     cursorMotion.currentX += (cursorMotion.targetX - cursorMotion.currentX) * CURSOR_EASE;
     cursorMotion.currentY += (cursorMotion.targetY - cursorMotion.currentY) * CURSOR_EASE;
 
@@ -415,8 +430,32 @@ function syncCursorGlowFrame() {
     cursorMotion.frame = 0;
 }
 
+function toggleEffects() {
+    effectsDisabled = !effectsDisabled;
+    localStorage.setItem("uniform-field-effects-disabled", effectsDisabled);
+    
+    if (effectsDisabled) {
+        root.style.setProperty("--cursor-x", "50vw");
+        root.style.setProperty("--cursor-y", "35vh");
+        cursorMotion.frame = 0;
+    }
+    
+    fxToggle.dataset.fxDisabled = effectsDisabled;
+    fxToggle.textContent = effectsDisabled ? "✨" : "✨";
+    fxToggle.title = effectsDisabled ? "Bật hiệu ứng" : "Tắt hiệu ứng";
+}
+
+function hydrateEffectsState() {
+    const storedState = localStorage.getItem("uniform-field-effects-disabled");
+    effectsDisabled = storedState === "true";
+    if (fxToggle) {
+        fxToggle.dataset.fxDisabled = effectsDisabled;
+        fxToggle.title = effectsDisabled ? "Bật hiệu ứng" : "Tắt hiệu ứng";
+    }
+}
+
 function syncCursorGlow(event) {
-    if (event.pointerType === "touch") return;
+    if (event.pointerType === "touch" || effectsDisabled) return;
 
     cursorMotion.targetX = event.clientX;
     cursorMotion.targetY = event.clientY;
@@ -458,7 +497,7 @@ function bindInteractiveSurface(surface) {
     };
 
     const ensureFrame = () => {
-        if (!state.frame) {
+        if (!state.frame && !effectsDisabled) {
             state.frame = window.requestAnimationFrame(animateSurface);
         }
     };
@@ -468,7 +507,9 @@ function bindInteractiveSurface(surface) {
         state.targetY = 0;
         surface.style.setProperty("--surface-light-x", "50%");
         surface.style.setProperty("--surface-light-y", "50%");
-        ensureFrame();
+        if (!effectsDisabled) {
+            ensureFrame();
+        }
     };
 
     surface.classList.add("interactive-surface");
@@ -490,7 +531,9 @@ function bindInteractiveSurface(surface) {
         state.targetY = isGlowSurface ? 0 : (px - 0.5) * SURFACE_TILT_INTENSITY;
         surface.style.setProperty("--surface-light-x", `${(px * 100).toFixed(2)}%`);
         surface.style.setProperty("--surface-light-y", `${(py * 100).toFixed(2)}%`);
-        ensureFrame();
+        if (!effectsDisabled) {
+            ensureFrame();
+        }
     });
 
     surface.addEventListener("pointerleave", resetSurface);
@@ -732,6 +775,10 @@ function updateModeButtons() {
     calcModeSwitch.querySelectorAll("[data-calc-mode]").forEach((button) => {
         button.classList.toggle("is-active", button.dataset.calcMode === simulatorState.mode);
     });
+    
+    forceModeSwitch.querySelectorAll("[data-force-mode]").forEach((button) => {
+        button.classList.toggle("is-active", button.dataset.forceMode === simulatorState.forceMethod);
+    });
 }
 
 function updateChargeButtons() {
@@ -745,7 +792,7 @@ function calculateSimulation() {
     const safeDistance = clampPositive(simulatorState.distance, 0.04, 1e-6, 100);
     const safeField = clampPositive(simulatorState.field, 3000, 1e-9, 1e12);
 
-    if (simulatorState.mode === "field" || simulatorState.mode === "force") {
+    if (simulatorState.mode === "field") {
         simulatorState.voltage = safeVoltage;
         simulatorState.distance = safeDistance;
         simulatorState.field = safeVoltage / safeDistance;
@@ -761,6 +808,16 @@ function calculateSimulation() {
         simulatorState.voltage = safeVoltage;
         simulatorState.field = safeField;
         simulatorState.distance = safeVoltage / safeField;
+    }
+
+    if (simulatorState.mode === "force") {
+        simulatorState.voltage = safeVoltage;
+        simulatorState.distance = safeDistance;
+        if (simulatorState.forceMethod === "u-method") {
+            simulatorState.field = safeVoltage / safeDistance;
+        } else {
+            simulatorState.field = safeField;
+        }
     }
 
     simulatorState.chargeMagnitude = clampPositive(simulatorState.chargeMagnitude, 2e-7, 1e-12, 1);
@@ -784,23 +841,24 @@ function paintRange(range) {
 function syncSliderState() {
     const computedKey = formulaModes[simulatorState.mode].output;
     const isForceMode = simulatorState.mode === "force";
+    const useEMethod = simulatorState.forceMethod === "e-method";
 
-    voltageRange.disabled = computedKey === "voltage";
-    distanceRange.disabled = computedKey === "distance";
+    voltageRange.disabled = computedKey === "voltage" || (isForceMode && useEMethod);
+    distanceRange.disabled = computedKey === "distance" || (isForceMode && useEMethod);
 
     voltageRange.value = `${clamp(simulatorState.voltage, Number(voltageRange.min), Number(voltageRange.max))}`;
 
     const distanceInCm = simulatorState.distance * 100;
     distanceRange.value = `${clamp(distanceInCm, Number(distanceRange.min), Number(distanceRange.max))}`;
 
-    voltageInput.disabled = computedKey === "voltage";
-    distanceInput.disabled = computedKey === "distance";
-    fieldInput.disabled = computedKey === "field" || isForceMode;
-    forceInput.disabled = computedKey === "force";
+    voltageInput.disabled = computedKey === "voltage" || (isForceMode && useEMethod);
+    distanceInput.disabled = computedKey === "distance" || (isForceMode && useEMethod);
+    fieldInput.disabled = computedKey === "field" || (isForceMode && !useEMethod);
+    forceInput.disabled = isForceMode;
 
-    voltageCard.classList.toggle("is-computed", computedKey === "voltage");
-    distanceCard.classList.toggle("is-computed", computedKey === "distance");
-    fieldCard.classList.toggle("is-computed", computedKey === "field" || isForceMode);
+    voltageCard.classList.toggle("is-computed", computedKey === "voltage" || (isForceMode && useEMethod));
+    distanceCard.classList.toggle("is-computed", computedKey === "distance" || (isForceMode && useEMethod));
+    fieldCard.classList.toggle("is-computed", computedKey === "field" || (isForceMode && !useEMethod));
 
     paintRange(voltageRange);
     paintRange(distanceRange);
@@ -857,7 +915,14 @@ function renderSimulation() {
     const glow = clamp(opacity * 0.92, 0.22, 0.92);
 
     calcModeValue.textContent = mode.label;
-    modeHint.textContent = mode.note;
+    
+    forceModeSwitch.style.display = simulatorState.mode === "force" ? "grid" : "none";
+    
+    if (simulatorState.mode === "force" && simulatorState.forceMethod === "e-method") {
+        modeHint.textContent = "Nhập |q| và E, hệ sẽ tính lực điện theo công thức F = |q| × E. Ô viền sáng là đại lượng đang được hệ tự tính.";
+    } else {
+        modeHint.textContent = mode.note;
+    }
     summaryMode.textContent = mode.label;
 
     syncSliderState();
@@ -881,9 +946,11 @@ function renderSimulation() {
     forceLabel.textContent = "L\u1ef1c \u0111i\u1ec7n F";
     forceValue.textContent = formatForce(force);
     if (forceHint) {
-        forceHint.textContent = simulatorState.mode === "force"
-            ? `\u0110ang t\u1ef1 t\u00ednh t\u1eeb U, d v\u00e0 |q| = ${chargeLabel}.`
-            : `C\u00f3 th\u1ec3 nh\u1eadp F \u0111\u1ec3 h\u1ec7 suy ra |q| khi E \u0111\u00e3 bi\u1ebft. Hi\u1ec7n t\u1ea1i |q| = ${chargeLabel}.`;
+        if (simulatorState.mode === "force") {
+            forceHint.textContent = `Nh\u1eadp F \u0111\u1ec3 h\u1ec7 suy ra E = F / |q|. Hi\u1ec7n t\u1ea1i |q| = ${chargeLabel}.`;
+        } else {
+            forceHint.textContent = `C\u00f3 th\u1ec3 nh\u1eadp F \u0111\u1ec3 h\u1ec7 suy ra |q| khi E \u0111\u00e3 bi\u1ebft. Hi\u1ec7n t\u1ea1i |q| = ${chargeLabel}.`;
+        }
     }
     fieldResultCard?.classList.toggle("is-emphasis", mode.resultKey === "field");
     forceResultCard?.classList.toggle("is-emphasis", mode.resultKey === "force");
@@ -944,7 +1011,11 @@ function commitManualBinding(binding) {
 
     if (nextValue.state === "valid") {
         if (binding.key === "force") {
-            applyForceToChargeMagnitude(nextValue.value);
+            if (simulatorState.mode === "force") {
+                applyForceToField(nextValue.value);
+            } else {
+                applyForceToChargeMagnitude(nextValue.value);
+            }
         } else {
             simulatorState[binding.key] = nextValue.value;
         }
@@ -971,7 +1042,11 @@ function updateManualBinding(binding) {
     }
 
     if (binding.key === "force") {
-        applyForceToChargeMagnitude(nextValue.value);
+        if (simulatorState.mode === "force") {
+            applyForceToField(nextValue.value);
+        } else {
+            applyForceToChargeMagnitude(nextValue.value);
+        }
     } else {
         simulatorState[binding.key] = nextValue.value;
     }
@@ -1083,7 +1158,18 @@ calcModeSwitch.addEventListener("click", (event) => {
     renderSimulation();
 });
 
+forceModeSwitch.addEventListener("click", (event) => {
+    const button = event.target.closest("[data-force-mode]");
+    if (!button) return;
+
+    simulatorState.forceMethod = button.dataset.forceMode;
+    renderSimulation();
+});
+
 themeToggle.addEventListener("click", toggleTheme);
+if (fxToggle) {
+    fxToggle.addEventListener("click", toggleEffects);
+}
 voltageRange.addEventListener("input", updateFromVoltageRange);
 distanceRange.addEventListener("input", updateFromDistanceRange);
 manualBindings.forEach(attachManualBinding);
@@ -1091,6 +1177,7 @@ manualBindings.forEach(attachManualBinding);
 window.addEventListener("pointermove", syncCursorGlow, { passive: true });
 
 hydrateTheme();
+hydrateEffectsState();
 renderFaqs();
 renderPracticeItems();
 setActiveChapter(0);

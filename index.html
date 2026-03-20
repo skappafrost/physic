@@ -25,19 +25,18 @@
         <div class="loading-bar" aria-hidden="true"><span></span></div>
     </div>
 
-    <div class="site-backdrop" aria-hidden="true">
-        <div class="shooting-stars" id="fxStars"></div>
-        <ul class="energy-circles">
-            <li></li>
-            <li></li>
-            <li></li>
-            <li></li>
-            <li></li>
-            <li></li>
-            <li></li>
-            <li></li>
-        </ul>
-    </div>
+    <div class="site-backdrop" aria-hidden="true"></div>
+    <div class="shooting-stars" id="fxStars"></div>
+    <ul class="energy-circles">
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+    </ul>
 
     <header class="site-header">
         <a class="brand" href="#top" aria-label="Điện trường đều">
@@ -180,6 +179,10 @@
                             <button class="mode-option" data-calc-mode="voltage" type="button">Tính U</button>
                             <button class="mode-option" data-calc-mode="distance" type="button">Tính d</button>
                             <button class="mode-option" data-calc-mode="force" type="button">Tính F</button>
+                        </div>
+                        <div class="mode-switch force-mode-switch" id="forceModeSwitch" style="display: none;">
+                            <button class="mode-option is-active" data-force-mode="e-method" type="button">Từ q & E</button>
+                            <button class="mode-option" data-force-mode="u-method" type="button">Từ U & d</button>
                         </div>
                         <p class="control-note" id="modeHint">Nhập U và d, hệ sẽ tự tính cường độ điện trường E. Ô viền sáng là đại lượng đang được hệ tự tính.</p>
                     </article>
@@ -405,6 +408,8 @@
             </div>
         </section>
     </main>
+
+    <button class="fx-toggle" id="fxToggle" type="button" title="Bật/tắt hiệu ứng" aria-label="Bật/tắt hiệu ứng">✨</button>
 
     <script type="module" src="./app.js"></script>
 </body>
