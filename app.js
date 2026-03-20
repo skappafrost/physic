@@ -58,6 +58,10 @@ const forceResultCard = document.getElementById("forceResultCard");
 const voltageCard = voltageRange.closest(".control-card");
 const distanceCard = distanceRange.closest(".control-card");
 const fieldCard = fieldInput.closest(".control-card");
+const chargeCard = document.getElementById("chargeCard");
+
+const chargeResultCard = document.getElementById("chargeResultCard");
+const chargeResultValue = document.getElementById("chargeResultValue");
 
 const formulaModes = {
     field: {
@@ -85,6 +89,13 @@ const formulaModes = {
         output: "force",
         note: "Nh\u1eadp U, d v\u00e0 |q|, h\u1ec7 s\u1ebd t\u00ednh E = U / d r\u1ed3i suy ra l\u1ef1c \u0111i\u1ec7n theo c\u00f4ng th\u1ee9c F = |q|E. \u00d4 vi\u1ec1n s\u00e1ng l\u00e0 \u0111\u1ea1i l\u01b0\u1ee3ng \u0111ang \u0111\u01b0\u1ee3c h\u1ec7 t\u1ef1 t\u00ednh.",
         resultKey: "force"
+    },
+    charge: {
+        key: "charge",
+        label: "T\u00ednh q",
+        output: "charge",
+        note: "Nh\u1eadp F v\u00e0 E, h\u1ec7 s\u1ebd t\u1ef1 t\u00ednh \u0111i\u1ec7n t\u00edch theo c\u00f4ng th\u1ee9c q = F / E. \u00d4 vi\u1ec1n s\u00e1ng l\u00e0 \u0111\u1ea1i l\u01b0\u1ee3ng \u0111ang \u0111\u01b0\u1ee3c h\u1ec7 t\u1ef1 t\u00ednh.",
+        resultKey: "charge"
     }
 };
 
@@ -820,6 +831,14 @@ function calculateSimulation() {
         }
     }
 
+    if (simulatorState.mode === "charge") {
+        simulatorState.field = safeField;
+        const forceRead = readManualValue(forceInput, forceUnit, 0, 1e-12, 1e12);
+        if (forceRead.state === "valid") {
+            applyForceToChargeMagnitude(forceRead.value);
+        }
+    }
+
     simulatorState.chargeMagnitude = clampPositive(simulatorState.chargeMagnitude, 2e-7, 1e-12, 1);
 }
 
@@ -841,6 +860,7 @@ function paintRange(range) {
 function syncSliderState() {
     const computedKey = formulaModes[simulatorState.mode].output;
     const isForceMode = simulatorState.mode === "force";
+    const isChargeMode = simulatorState.mode === "charge";
     const useEMethod = simulatorState.forceMethod === "e-method";
 
     voltageRange.disabled = computedKey === "voltage" || (isForceMode && useEMethod);
@@ -854,11 +874,13 @@ function syncSliderState() {
     voltageInput.disabled = computedKey === "voltage" || (isForceMode && useEMethod);
     distanceInput.disabled = computedKey === "distance" || (isForceMode && useEMethod);
     fieldInput.disabled = computedKey === "field" || (isForceMode && !useEMethod);
-    forceInput.disabled = isForceMode;
+    forceInput.disabled = computedKey === "force";
+    chargeMagnitudeInput.disabled = computedKey === "charge";
 
     voltageCard.classList.toggle("is-computed", computedKey === "voltage" || (isForceMode && useEMethod));
     distanceCard.classList.toggle("is-computed", computedKey === "distance" || (isForceMode && useEMethod));
     fieldCard.classList.toggle("is-computed", computedKey === "field" || (isForceMode && !useEMethod));
+    chargeCard?.classList.toggle("is-computed", computedKey === "charge");
 
     paintRange(voltageRange);
     paintRange(distanceRange);
@@ -909,7 +931,15 @@ function renderSimulation() {
     calculateSimulation();
 
     const mode = formulaModes[simulatorState.mode];
-    const force = simulatorState.field * simulatorState.chargeMagnitude;
+    let force;
+
+    if (simulatorState.mode === "charge") {
+        const forceRead = readManualValue(forceInput, forceUnit, 0, 1e-12, 1e12);
+        force = forceRead.state === "valid" ? forceRead.value : simulatorState.field * simulatorState.chargeMagnitude;
+    } else {
+        force = simulatorState.field * simulatorState.chargeMagnitude;
+    }
+
     const opacity = clamp(simulatorState.field / 11000, 0.28, 1);
     const speed = clamp(8.6 - opacity * 3.3, 3.6, 8.6);
     const glow = clamp(opacity * 0.92, 0.22, 0.92);
@@ -920,6 +950,8 @@ function renderSimulation() {
     
     if (simulatorState.mode === "force" && simulatorState.forceMethod === "e-method") {
         modeHint.textContent = "Nhập |q| và E, hệ sẽ tính lực điện theo công thức F = |q| × E. Ô viền sáng là đại lượng đang được hệ tự tính.";
+    } else if (simulatorState.mode === "charge") {
+        modeHint.textContent = "Nhập F và E, hệ sẽ tính điện tích theo công thức q = F / E. Ô viền sáng là đại lượng đang được hệ tự tính.";
     } else {
         modeHint.textContent = mode.note;
     }
@@ -941,19 +973,24 @@ function renderSimulation() {
     summaryDistance.textContent = formatWithSelectedUnit(simulatorState.distance, distanceUnit);
     summaryField.textContent = formatWithSelectedUnit(simulatorState.field, fieldUnit);
     summaryForce.textContent = formatForce(force);
+    chargeResultValue.textContent = formatWithSelectedUnit(simulatorState.chargeMagnitude, chargeMagnitudeUnit);
 
     const chargeLabel = `${formatDisplayNumber(convertFromBase(simulatorState.chargeMagnitude, chargeMagnitudeUnit))} ${getSelectedUnitLabel(chargeMagnitudeUnit)}`;
     forceLabel.textContent = "L\u1ef1c \u0111i\u1ec7n F";
     forceValue.textContent = formatForce(force);
     if (forceHint) {
-        if (simulatorState.mode === "force") {
-            forceHint.textContent = `Nh\u1eadp F \u0111\u1ec3 h\u1ec7 suy ra E = F / |q|. Hi\u1ec7n t\u1ea1i |q| = ${chargeLabel}.`;
+        if (simulatorState.mode === "charge") {
+            forceHint.textContent = `Nhập F và E, hệ suy ra |q| = F / E. Hiện tại E = ${formatWithSelectedUnit(simulatorState.field, fieldUnit)}.`;
+        } else if (simulatorState.mode === "force") {
+            forceHint.textContent = `Nhập F để hệ suy ra E = F / |q|. Hiện tại |q| = ${chargeLabel}.`;
         } else {
-            forceHint.textContent = `C\u00f3 th\u1ec3 nh\u1eadp F \u0111\u1ec3 h\u1ec7 suy ra |q| khi E \u0111\u00e3 bi\u1ebft. Hi\u1ec7n t\u1ea1i |q| = ${chargeLabel}.`;
+            forceHint.textContent = `Có thể nhập F để hệ suy ra |q| khi E đã biết. Hiện tại |q| = ${chargeLabel}.`;
         }
     }
+
     fieldResultCard?.classList.toggle("is-emphasis", mode.resultKey === "field");
     forceResultCard?.classList.toggle("is-emphasis", mode.resultKey === "force");
+    chargeResultCard?.classList.toggle("is-emphasis", mode.resultKey === "charge");
 
     updateModeButtons();
     updateVisualState();

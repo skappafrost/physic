@@ -4,9 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="color-scheme" content="dark light">
-    <title>Điện Trường Đều | Bài Học Tương Tác</title>
+    <title>INFOGRAPHIC | Điện Trường Đều</title>
     <link rel="stylesheet" href="./styles.css">
     <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <link rel="icon" type="image/png" href="./assets/favicon.png">
 </head>
 <body class="is-loading">
     <div class="loading-screen" id="loadingScreen" aria-live="polite">
@@ -179,6 +180,7 @@
                             <button class="mode-option" data-calc-mode="voltage" type="button">Tính U</button>
                             <button class="mode-option" data-calc-mode="distance" type="button">Tính d</button>
                             <button class="mode-option" data-calc-mode="force" type="button">Tính F</button>
+                            <button class="mode-option" data-calc-mode="charge" type="button">Tính q</button>
                         </div>
                         <div class="mode-switch force-mode-switch" id="forceModeSwitch" style="display: none;">
                             <button class="mode-option is-active" data-force-mode="e-method" type="button">Từ q & E</button>
@@ -285,6 +287,10 @@
                         <article class="result-card" id="fieldResultCard">
                             <span>Cường độ điện trường</span>
                             <strong id="fieldValue">3.000 V/m</strong>
+                        </article>
+                        <article class="result-card" id="chargeResultCard">
+                            <span>Điện tích q</span>
+                            <strong id="chargeResultValue">2,00 x 10^-7 C</strong>
                         </article>
                         <article class="result-card" id="forceResultCard">
                             <span id="forceLabel">Lực điện F</span>
