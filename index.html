@@ -11,7 +11,7 @@
 </head>
 <body class="is-loading">
     <div class="loading-screen" id="loadingScreen" aria-live="polite">
-        <button class="loading-skip" id="loadingSkip" type="button">Bỏ qua</button>
+        <button class="loading-skip" id="loadingSkip" type="button">Vui lòng chờ...</button>
         <div class="loading-core">
             <span class="loading-orbit loading-orbit--one"></span>
             <span class="loading-orbit loading-orbit--two"></span>
@@ -418,5 +418,66 @@
     <button class="fx-toggle" id="fxToggle" type="button" title="Bật/tắt hiệu ứng" aria-label="Bật/tắt hiệu ứng">✨</button>
 
     <script type="module" src="./app.js"></script>
+    <!-- 👤 Floating Credits Button -->
+    <button id="creditsFab" class="credits-fab interactive-surface">
+        👤
+    </button>
+
+    <!-- 📜 Credits Modal -->
+    <div id="creditsModal" class="credits-modal">
+        <div class="credits-backdrop"></div>
+
+        <div class="credits-panel">
+            <button id="creditsClose" class="credits-close">✕</button>
+
+            <h3>Credits</h3>
+
+            <!-- 🔥 HERO MEMBERS -->
+            <div class="credits-hero">
+                <div class="credit-hero-card">
+                    Hà Văn Trung
+                    <span class="role role--primary">Lead Web Architect</span>
+                </div>
+
+                <div class="credit-hero-card">
+                    Lê Văn Tâm
+                    <span class="role role--secondary">Frontend Engineer</span>
+                </div>
+
+                <div class="credit-hero-card">
+                    Đỗ Phú Quang
+                    <span class="role role--leader">Project Lead</span>
+                </div>
+            </div>
+
+            <!-- 👥 NORMAL MEMBERS -->
+            <ul class="credits-list">
+                <li>
+                    <strong>Hồ Nhật Minh</strong>
+                    <span class="role">Core Contributor</span>
+                </li>
+
+                <li>
+                    <strong>Nguyễn Hoàng Nam</strong>
+                    <span class="role">Support Engineer</span>
+                </li>
+
+                <li>
+                    <strong>Phan Sỹ Minh Thắng</strong>
+                    <span class="role">Support Engineer</span>
+                </li>
+
+                <li>
+                    <strong>Nguyễn Kim Minh Khuê</strong>
+                    <span class="role">Contributor</span>
+                </li>
+
+                <li>
+                    <strong>Nguyễn Ngọc Minh Xuân</strong>
+                    <span class="role">Contributor</span>
+                </li>
+            </ul>
+        </div>
+    </div>
 </body>
 </html>

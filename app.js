@@ -11,6 +11,8 @@ const loadingSkip = document.getElementById("loadingSkip");
 const mathJaxScript = document.getElementById("MathJax-script");
 const fxStarsEl = document.getElementById("fxStars");
 const fxToggle = document.getElementById("fxToggle");
+const FX_MODE_STORAGE_KEY = "uniform-field-fx-mode";
+const FX_MODES = ["full", "off", "lite"];
 
 const voltageRange = document.getElementById("voltageRange");
 const distanceRange = document.getElementById("distanceRange");
@@ -441,28 +443,61 @@ function syncCursorGlowFrame() {
     cursorMotion.frame = 0;
 }
 
-function toggleEffects() {
-    effectsDisabled = !effectsDisabled;
-    localStorage.setItem("uniform-field-effects-disabled", effectsDisabled);
-    
+function applyFxMode(mode) {
+    const safeMode = FX_MODES.includes(mode) ? mode : "full";
+
+    root.dataset.fxMode = safeMode;
+    fxToggle.dataset.fxMode = safeMode;
+
+    effectsDisabled = safeMode !== "full";
+    fxToggle.dataset.fxDisabled = String(effectsDisabled);
+
+    localStorage.setItem(FX_MODE_STORAGE_KEY, safeMode);
+    localStorage.setItem("uniform-field-effects-disabled", String(effectsDisabled));
+
     if (effectsDisabled) {
         root.style.setProperty("--cursor-x", "50vw");
         root.style.setProperty("--cursor-y", "35vh");
         cursorMotion.frame = 0;
     }
-    
-    fxToggle.dataset.fxDisabled = effectsDisabled;
-    fxToggle.textContent = effectsDisabled ? "✨" : "✨";
-    fxToggle.title = effectsDisabled ? "Bật hiệu ứng" : "Tắt hiệu ứng";
+
+    fxToggle.textContent = "✨";
+    fxToggle.title =
+        safeMode === "full"
+            ? "Tắt hiệu ứng"
+            : safeMode === "off"
+                ? "Bật chế độ siêu nhẹ"
+                : "Bật lại hiệu ứng đầy đủ";
 }
 
 function hydrateEffectsState() {
-    const storedState = localStorage.getItem("uniform-field-effects-disabled");
-    effectsDisabled = storedState === "true";
-    if (fxToggle) {
-        fxToggle.dataset.fxDisabled = effectsDisabled;
-        fxToggle.title = effectsDisabled ? "Bật hiệu ứng" : "Tắt hiệu ứng";
+    const storedMode = localStorage.getItem(FX_MODE_STORAGE_KEY);
+    const storedDisabled = localStorage.getItem("uniform-field-effects-disabled");
+
+    let initialMode = "full";
+
+    if (FX_MODES.includes(storedMode)) {
+        initialMode = storedMode;
+    } else if (storedDisabled === "true") {
+        initialMode = "off";
     }
+
+    applyFxMode(initialMode);
+}
+
+function toggleEffects() {
+    const currentMode = FX_MODES.includes(root.dataset.fxMode)
+        ? root.dataset.fxMode
+        : (effectsDisabled ? "off" : "full");
+
+    const nextMode =
+        currentMode === "full"
+            ? "off"
+            : currentMode === "off"
+                ? "lite"
+                : "full";
+
+    applyFxMode(nextMode);
 }
 
 function syncCursorGlow(event) {
@@ -1234,3 +1269,20 @@ if (mathJaxScript) {
         typesetMath(document.body);
     }, { once: true });
 }
+
+const creditsFab = document.getElementById("creditsFab");
+const creditsModal = document.getElementById("creditsModal");
+const creditsClose = document.getElementById("creditsClose");
+const creditsBackdrop = document.querySelector(".credits-backdrop");
+
+creditsFab.addEventListener("click", () => {
+    creditsModal.classList.add("is-open");
+});
+
+creditsClose.addEventListener("click", () => {
+    creditsModal.classList.remove("is-open");
+});
+
+creditsBackdrop.addEventListener("click", () => {
+    creditsModal.classList.remove("is-open");
+});
