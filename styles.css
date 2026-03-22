@@ -1510,7 +1510,11 @@ html[data-fx-mode="lite"] .fx-toggle:hover {
     border: 1px solid rgba(255,255,255,0.08);
     backdrop-filter: blur(20px);
     opacity: 0;
-    transition: 0.25s;
+    transition:
+        opacity 280ms var(--ease-smooth),
+        transform 280ms var(--ease-smooth),
+        background 280ms var(--ease-smooth),
+        color 280ms var(--ease-smooth);
 }
 
 .credits-modal.is-open .credits-panel {
@@ -1637,4 +1641,251 @@ html[data-fx-mode="lite"] .fx-toggle:hover {
 
 .credits-list li:hover {
     opacity: 1;
+}
+
+/* ============================= */
+/* 🌞 LIGHT MODE - CREDITS FIX  */
+/* ============================= */
+
+[data-theme="light"] .credits-panel {
+    background: #ffffff;
+    color: #111;
+    border-radius: 18px;
+}
+
+/* HERO CARDS */
+[data-theme="light"] .credit-hero-card {
+    background: linear-gradient(135deg, #2563eb, #7c3aed);
+    color: #fff;
+
+    box-shadow:
+        0 6px 18px rgba(0,0,0,0.12),
+        0 0 12px rgba(124, 58, 237, 0.25);
+}
+
+/* giảm glow cho đỡ chói */
+[data-theme="light"] .credit-hero-card::before {
+    opacity: 0.25;
+    filter: blur(6px);
+}
+
+/* hover vẫn giữ đẹp nhưng nhẹ hơn */
+[data-theme="light"] .credit-hero-card:hover {
+    transform: translateY(-4px) scale(1.05);
+
+    box-shadow:
+        0 10px 22px rgba(0,0,0,0.15),
+        0 0 16px rgba(124, 58, 237, 0.35);
+}
+
+/* LIST thường rõ hơn */
+[data-theme="light"] .credits-list {
+    opacity: 0.9;
+}
+
+/* TEXT role dễ đọc */
+[data-theme="light"] .role {
+    color: rgba(0,0,0,0.65);
+}
+
+/* BACKDROP */
+[data-theme="light"] .credits-backdrop {
+    background: rgba(0,0,0,0.4);
+}
+
+.force-mode-switch {
+    animation: fadeSlide 1s ease;
+}
+
+@keyframes fadeSlide {
+    from {
+        opacity: 0;
+        transform: translateY(-6px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+#forceModeSwitch {
+    display: flex;
+    gap: 10px;
+    margin-top: 12px;
+    width: 100%;
+}
+
+#forceModeSwitch .mode-option {
+    flex: 1;
+    text-align: center;
+}
+
+#forceModeSwitch .mode-option {
+    flex: 1;
+    text-align: center;
+}
+
+#forceModeSwitch .mode-option {
+    transition: all 0.25s ease;
+}
+
+#forceModeSwitch .mode-option.is-active {
+    background: linear-gradient(135deg, #00f0ff, #6a5cff);
+    color: #fff;
+    box-shadow: 0 4px 20px rgba(0,255,255,0.25);
+}
+
+#forceModeSwitch .mode-option {
+    transition: all 0.25s ease;
+}
+
+#forceModeSwitch .mode-option.is-active {
+    background: linear-gradient(135deg, #00f0ff, #6a5cff);
+    color: #fff;
+    box-shadow: 0 4px 20px rgba(0,255,255,0.25);
+}
+
+/* =========================
+   GLOBAL MOTION POLISH
+   ========================= */
+
+.site-header,
+.hero,
+.lesson-workspace,
+.sim-layout,
+.faq-item,
+.practice-card,
+.memory-card,
+.chapter-card,
+.control-card,
+.result-card,
+.summary-line,
+.stage-card,
+.sim-visual,
+.hero-sigil,
+.stat-card,
+.button,
+.theme-toggle,
+.top-nav a,
+.mode-option,
+.charge-option,
+.practice-card__toggle,
+.credits-fab,
+.credits-panel,
+.credits-backdrop,
+.loading-screen,
+.loading-orbit,
+.loading-particle,
+.loading-bar span,
+.plate,
+.field-lane::after,
+.scene-charge,
+.sim-charge,
+.scene-arrow__shaft,
+.sim-arrow,
+.stage-chip,
+.brand-mark {
+    will-change: transform, opacity, box-shadow, border-color, background-color;
+}
+
+/* cảm giác “trôi” nhẹ thay vì xuất hiện cái đùng */
+.hero,
+.lesson-workspace,
+.sim-layout,
+.chapter-panel,
+.sim-controls,
+.sim-stage,
+.faq-item,
+.practice-card,
+.memory-card,
+.chapter-card,
+.control-card,
+.result-card {
+    transform: translateY(0);
+    transition:
+        transform 320ms var(--ease-smooth),
+        opacity 320ms var(--ease-smooth),
+        box-shadow 320ms var(--ease-smooth),
+        border-color 320ms var(--ease-smooth),
+        background-color 320ms var(--ease-smooth);
+}
+
+/* các khối reveal do JS gắn .motion-target */
+.motion-target {
+    opacity: 0;
+    transform: translateY(24px) scale(0.985);
+    filter: blur(10px);
+    transition:
+        opacity 520ms var(--ease-smooth),
+        transform 520ms var(--ease-smooth),
+        filter 620ms var(--ease-smooth);
+}
+
+.motion-target.is-visible {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    filter: none;
+}
+
+/* popup credits mượt hơn */
+.credits-modal {
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 240ms var(--ease-smooth);
+}
+
+.credits-modal.is-open {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.credits-backdrop {
+    opacity: 0;
+    transition: opacity 240ms var(--ease-smooth);
+}
+
+.credits-modal.is-open .credits-backdrop {
+    opacity: 1;
+}
+
+.credits-panel {
+    opacity: 0;
+    transform: translate(-50%, -46%) scale(0.96);
+    transition:
+        opacity 280ms var(--ease-smooth),
+        transform 280ms var(--ease-smooth);
+}
+
+.credits-modal.is-open .credits-panel {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+}
+
+/* hiệu ứng nút/khối sáng bên trong */
+.button,
+.theme-toggle,
+.top-nav a,
+.mode-option,
+.charge-option,
+.practice-card__toggle,
+.fx-toggle,
+.credits-fab {
+    transition:
+        transform 220ms var(--ease-smooth),
+        box-shadow 220ms var(--ease-smooth),
+        border-color 220ms var(--ease-smooth),
+        background-color 220ms var(--ease-smooth),
+        color 220ms var(--ease-smooth);
+}
+
+/* hover “nâng” nhẹ, không giật */
+.button:hover,
+.theme-toggle:hover,
+.top-nav a:hover,
+.mode-option:hover,
+.charge-option:hover,
+.practice-card__toggle:hover,
+.fx-toggle:hover,
+.credits-fab:hover {
+    transform: translateY(-2px);
 }
